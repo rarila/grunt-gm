@@ -1,0 +1,31 @@
+{
+  "name": "grunt-gm",
+  "version": "0.0.0",
+  "description": "Batch process your images with gm.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/h0ward/grunt-gm.git"
+  },
+  "keywords": [
+    "grunt",
+    "gruntplugin",
+    "graphicsmagick",
+    "imagemagick",
+    "image",
+    "graphic",
+    "magick",
+    "resize",
+    "watermark"
+  ],
+  "author": "H0WARD <h0ward@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/h0ward/grunt-gm/issues"
+  },
+  "homepage": "https://github.com/h0ward/grunt-gm",
+  "dependencies": {
+    "gm": "^1.16.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-coffee": "^0.10.1"
+  }
+}
