@@ -19,8 +19,45 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-gm');
 ```
 
-*This plugin was designed to work with Grunt 0.4.x. If you're still using grunt v0.3.x it's strongly recommended that [you upgrade](http://gruntjs.com/upgrading-from-0.3-to-0.4).*
+### Overview
+At the moment the task is pretty much just a simple `grunt` wrapper to [gm][1].
+
+
+### The Task
+See [basic usages][2].
+```javascript
+grunt.initConfig({
+  gm: {
+    test: {
+      files: [
+        {
+          cwd: 'test',
+          dest: 'test/out',
+          expand: true,
+          filter: 'isFile',
+          src: ['**/*', '!**/out/*'],
+          tasks: {
+            options: [{imageMagick: true}],
+            noProfile: [],
+            resize: [200]
+          }
+        }
+      ]
+    }
+  }
+});
+```
+Task will traverse the file list and execute `gm` tasks one by one, top down.
+
+Grunt with `--verbose` flag to print the corresponding commands:
+`gm("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png",console.log)`
+
+
+
+## Release History
 
 
 
 [1]: http://aheckmann.github.io/gm
+[2]: https://github.com/aheckmann/gm#basic-usage
+

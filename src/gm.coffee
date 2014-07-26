@@ -20,5 +20,5 @@ module.exports = (grunt) ->
         (to / 1000).toFixed(2) + ' kB'
       ], color: 'green', separator: ' → '
       grunt.log.writeln ", #{(((to - from) / from) * 100).toFixed 2}%"
-      grunt.log.debug cmd
+      grunt.verbose.writeln cmd
       eval "#{cmd}"

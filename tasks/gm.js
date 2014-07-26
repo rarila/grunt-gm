@@ -28,7 +28,7 @@ module.exports = function(grunt) {
         separator: ' → '
       }));
       grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%");
-      grunt.log.debug(cmd);
+      grunt.verbose.writeln(cmd);
       _results.push(eval("" + cmd));
     }
     return _results;
