@@ -1,4 +1,4 @@
-# grunt-gm v0.0.0
+# grunt-gm v0.1.0
 
 > Batch process your images with [gm][1].
 
@@ -55,6 +55,8 @@ Grunt with `--verbose` flag to print the corresponding commands:
 
 
 ## Release History
+
+ * 2014-07-27   v0.1.0   Initial release
 
 
 
