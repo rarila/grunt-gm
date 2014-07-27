@@ -4,10 +4,12 @@ module.exports = function(grunt) {
   mkdirp = require('mkdirp');
   path = require('path');
   grunt.task.registerMultiTask('gm', function() {
-    var count, done, files, next, opts, skipExisting, stopOnError, total;
+    var count, done, errorItems, files, next, opts, skipExisting, skippedItems, stopOnError, total;
     done = this.async();
     files = this.files;
     opts = this.data.options;
+    skippedItems = [];
+    errorItems = [];
     skipExisting = grunt.option('skipExisting') || opts.skipExisting;
     stopOnError = grunt.option('stopOnError') || opts.stopOnError;
     count = 0;
@@ -15,6 +17,20 @@ module.exports = function(grunt) {
     (next = function(file) {
       var args, cmd, dir, name, _ref, _ref1, _skipExisting, _stopOnError;
       if (!file) {
+        if (skippedItems.length) {
+          grunt.log.subhead("" + skippedItems.length + " items skipped:");
+          grunt.log.writeln(grunt.log.wordlist(skippedItems, {
+            color: 'cyan',
+            separator: '\n'
+          }));
+        }
+        if (errorItems.length) {
+          grunt.log.subhead("" + errorItems.length + " items with error:");
+          grunt.log.writeln(grunt.log.wordlist(errorItems, {
+            color: 'red',
+            separator: '\n'
+          }));
+        }
         return done(true);
       }
       count++;
@@ -23,6 +39,7 @@ module.exports = function(grunt) {
       grunt.log.write("Processing " + file.src + "... ");
       if (_skipExisting && grunt.file.exists(file.dest) && fs.statSync(file.dest).size) {
         grunt.log.writeln("skipped, " + count + "/" + total);
+        skippedItems.push(file.dest);
         return next(files.shift());
       }
       if (!grunt.file.exists((dir = path.dirname(file.dest)))) {
@@ -51,6 +68,7 @@ module.exports = function(grunt) {
         var from, to;
         if (e || !grunt.file.exists(file.dest)) {
           grunt.log.error("Not written: " + file.dest + ", " + count + "/" + total);
+          errorItems.push(file.dest);
           if (_stopOnError) {
             return done(false);
           }

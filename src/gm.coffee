@@ -9,6 +9,8 @@ module.exports = (grunt) ->
     done = @async()
     files = @files
     opts = @data.options
+    skippedItems = []
+    errorItems = []
 
     # flags
     skipExisting = grunt.option('skipExisting') or opts.skipExisting
@@ -21,7 +23,16 @@ module.exports = (grunt) ->
     (next = (file) ->
 
       # done
-      return done true if not file
+      if not file
+        if skippedItems.length
+          grunt.log.subhead "#{skippedItems.length} items skipped:"
+          grunt.log.writeln grunt.log.wordlist skippedItems,
+            color: 'cyan', separator: '\n'
+        if errorItems.length
+          grunt.log.subhead "#{errorItems.length} items with error:"
+          grunt.log.writeln grunt.log.wordlist errorItems,
+            color: 'red', separator: '\n'
+        return done true
 
       # refs
       count++
@@ -34,6 +45,7 @@ module.exports = (grunt) ->
       if _skipExisting and
       grunt.file.exists(file.dest) and fs.statSync(file.dest).size
         grunt.log.writeln "skipped, #{count}/#{total}"
+        skippedItems.push file.dest
         return next files.shift()
 
       # create dest
@@ -59,6 +71,7 @@ module.exports = (grunt) ->
           # gm err or file write err
           if e or not grunt.file.exists file.dest
             grunt.log.error "Not written: #{file.dest}, #{count}/#{total}"
+            errorItems.push file.dest
             return done false if _stopOnError
           else
             from = fs.statSync(file.src[0]).size
