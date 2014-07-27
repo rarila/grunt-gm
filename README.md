@@ -1,4 +1,4 @@
-# grunt-gm v0.1.1
+# grunt-gm v0.1.2
 
 > Batch process your images with [gm][1].
 
@@ -55,9 +55,14 @@ Grunt with `--verbose` flag to print the corresponding commands:
 `node -e 'require("gm")("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png"...`
 
 
+## TODO
+ 1. How to require properly? `cmd = "require(\"#{__dirname}/../node_modules/gm\")(\"#{file.src}\")"`
+
+
 
 ## Release History
 
+ * 2014-07-27   v0.1.2   Temp fix require
  * 2014-07-27   v0.1.1   Fix log dump and `mkdir -p dest` if not exists
  * 2014-07-27   v0.1.0   Initial release
 

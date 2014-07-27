@@ -4,9 +4,11 @@ module.exports = function(grunt) {
   mkdirp = require('mkdirp');
   path = require('path');
   grunt.task.registerMultiTask('gm', function() {
-    var done, files, next;
-    files = this.files;
+    var done, files, next, pos, total;
     done = this.async();
+    files = this.files;
+    pos = 0;
+    total = files.length;
     (next = function(file) {
       var args, cmd, dir, name;
       if (!file) {
@@ -16,7 +18,7 @@ module.exports = function(grunt) {
         mkdirp(dir);
       }
       grunt.log.write("Processing " + file.src + "... ");
-      cmd = 'require("gm")("' + file.src + '")';
+      cmd = "require(\"" + __dirname + "/../node_modules/gm\")(\"" + file.src + "\")";
       for (name in file.tasks) {
         args = file.tasks[name].map(function(arg) {
           if (typeof arg !== 'object') {
@@ -46,7 +48,7 @@ module.exports = function(grunt) {
           color: 'green',
           separator: ' → '
         }));
-        grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%");
+        grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%, " + (pos++) + "/" + total);
         return next(files.shift());
       });
     })(files.shift());
