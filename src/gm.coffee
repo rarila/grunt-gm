@@ -16,7 +16,8 @@ module.exports = (grunt) ->
       return done true if not file
       mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
       grunt.log.write "Processing #{file.src}... "
-      cmd = 'require("gm")("' + file.src + '")'
+      # TODO how to require properly with -e
+      cmd = "require(\"#{__dirname}/../node_modules/gm\")(\"#{file.src}\")"
       for name of file.tasks
         args = file.tasks[name].map (arg) ->
           if typeof arg isnt 'object' then arg

@@ -18,7 +18,7 @@ module.exports = function(grunt) {
         mkdirp(dir);
       }
       grunt.log.write("Processing " + file.src + "... ");
-      cmd = 'require("gm")("' + file.src + '")';
+      cmd = "require(\"" + __dirname + "/../node_modules/gm\")(\"" + file.src + "\")";
       for (name in file.tasks) {
         args = file.tasks[name].map(function(arg) {
           if (typeof arg !== 'object') {
