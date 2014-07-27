@@ -1,4 +1,4 @@
-# grunt-gm v0.1.2
+# grunt-gm v0.2.0
 
 > Batch process your images with [gm][1].
 
@@ -31,6 +31,12 @@ See [basic usages][4].
 grunt.initConfig({
   gm: {
     test: {
+      options: {
+        // default: false, check if dest file exists and size > 0
+        skipExisting: false,
+        // default: false
+        stopOnError: false
+      },
       files: [
         {
           cwd: 'test',
@@ -38,6 +44,10 @@ grunt.initConfig({
           expand: true,
           filter: 'isFile',
           src: ['**/*', '!**/out/*'],
+          options: {
+            skipExisting: true,
+            stopOnError: true
+          }
           tasks: {
             options: [{imageMagick: true}],
             noProfile: [],
@@ -49,9 +59,12 @@ grunt.initConfig({
   }
 });
 ```
-Task will traverse the file list and execute `gm` tasks one by one, top down.
-
-Grunt with `--verbose` flag to print the corresponding commands:
+* Options precedence:
+  1. CLI, eg. `--skipExising`
+  * File, eg. `files:[{options:{skipExising:true}}]`
+  * Task, eg. `gm:{task1:{options:{skipExising:true}}`
+* Task will traverse the file list and execute `gm` tasks one by one, top down.
+* Grunt with `--verbose` flag to print the corresponding commands:
 `node -e 'require("gm")("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png"...`
 
 
@@ -62,6 +75,7 @@ Grunt with `--verbose` flag to print the corresponding commands:
 
 ## Release History
 
+ * 2014-07-28   v0.2.0   Add options `skipExisting` and `stopOnError`
  * 2014-07-27   v0.1.2   Temp fix require
  * 2014-07-27   v0.1.1   Fix log dump and `mkdir -p dest` if not exists
  * 2014-07-27   v0.1.0   Initial release
