@@ -4,14 +4,16 @@ module.exports = function(grunt) {
   mkdirp = require('mkdirp');
   path = require('path');
   grunt.task.registerMultiTask('gm', function() {
-    var count, done, errorItems, files, next, opts, skipExisting, skippedItems, stopOnError, total;
+    var SKIP_EXISTING, STOP_ON_ERROR, count, done, errorItems, files, next, opts, skipExisting, skippedItems, stopOnError, total;
     done = this.async();
     files = this.files;
     opts = this.data.options;
     skippedItems = [];
     errorItems = [];
-    skipExisting = grunt.option('skipExisting') || opts.skipExisting;
-    stopOnError = grunt.option('stopOnError') || opts.stopOnError;
+    skipExisting = opts.skipExisting;
+    stopOnError = opts.stopOnError;
+    SKIP_EXISTING = grunt.option('skipExisting');
+    STOP_ON_ERROR = grunt.option('stopOnError');
     count = 0;
     total = files.length;
     (next = function(file) {
@@ -34,8 +36,20 @@ module.exports = function(grunt) {
         return done(true);
       }
       count++;
-      _skipExisting = skipExisting || !!((_ref = file.options) != null ? _ref.skipExisting : void 0);
-      _stopOnError = stopOnError || !!((_ref1 = file.options) != null ? _ref1.stopOnError : void 0);
+      _skipExisting = (_ref = file.options) != null ? _ref.skipExisting : void 0;
+      _stopOnError = (_ref1 = file.options) != null ? _ref1.stopOnError : void 0;
+      if (_skipExisting === void 0) {
+        _skipExisting = skipExisting;
+      }
+      if (_stopOnError === void 0) {
+        _stopOnError = stopOnError;
+      }
+      if (SKIP_EXISTING !== void 0) {
+        _skipExisting = SKIP_EXISTING;
+      }
+      if (STOP_ON_ERROR !== void 0) {
+        _stopOnError = STOP_ON_ERROR;
+      }
       grunt.log.write("Processing " + file.src + "... ");
       if (_skipExisting && grunt.file.exists(file.dest) && fs.statSync(file.dest).size) {
         grunt.log.writeln("skipped, " + count + "/" + total);

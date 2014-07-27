@@ -13,8 +13,10 @@ module.exports = (grunt) ->
     errorItems = []
 
     # flags
-    skipExisting = grunt.option('skipExisting') or opts.skipExisting
-    stopOnError = grunt.option('stopOnError') or opts.stopOnError
+    skipExisting = opts.skipExisting
+    stopOnError = opts.stopOnError
+    SKIP_EXISTING = grunt.option 'skipExisting'
+    STOP_ON_ERROR = grunt.option 'stopOnError'
 
     # for log
     count = 0
@@ -36,8 +38,12 @@ module.exports = (grunt) ->
 
       # refs
       count++
-      _skipExisting = skipExisting or !! file.options?.skipExisting
-      _stopOnError = stopOnError or !! file.options?.stopOnError
+      _skipExisting = file.options?.skipExisting
+      _stopOnError = file.options?.stopOnError
+      if _skipExisting is undefined then _skipExisting = skipExisting
+      if _stopOnError is undefined then _stopOnError = stopOnError
+      if SKIP_EXISTING isnt undefined then _skipExisting = SKIP_EXISTING
+      if STOP_ON_ERROR isnt undefined then _stopOnError = STOP_ON_ERROR
 
       grunt.log.write "Processing #{file.src}... "
 
