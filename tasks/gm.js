@@ -1,15 +1,22 @@
 module.exports = function(grunt) {
-  var fs, gm;
+  var fs, mkdirp, path;
   fs = require('fs');
-  gm = require('gm');
-  return grunt.task.registerMultiTask('gm', function() {
-    var args, cmd, file, from, name, to, _i, _len, _ref, _results;
-    _ref = this.files;
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      file = _ref[_i];
+  mkdirp = require('mkdirp');
+  path = require('path');
+  grunt.task.registerMultiTask('gm', function() {
+    var done, files, next;
+    files = this.files;
+    done = this.async();
+    (next = function(file) {
+      var args, cmd, dir, name;
+      if (!file) {
+        return done(true);
+      }
+      if (!grunt.file.exists((dir = path.dirname(file.dest)))) {
+        mkdirp(dir);
+      }
       grunt.log.write("Processing " + file.src + "... ");
-      cmd = "gm(\"" + file.src + "\")";
+      cmd = 'require("gm")("' + file.src + '")';
       for (name in file.tasks) {
         args = file.tasks[name].map(function(arg) {
           if (typeof arg !== 'object') {
@@ -20,17 +27,30 @@ module.exports = function(grunt) {
         });
         cmd += "." + name + "(" + args + ")";
       }
-      cmd += ".write(\"" + file.dest + "\",console.log)";
-      from = fs.statSync(file.src[0]).size;
-      to = fs.statSync(file.dest).size;
-      grunt.log.write(grunt.log.wordlist([(from / 1000).toFixed(2) + ' kB', (to / 1000).toFixed(2) + ' kB'], {
-        color: 'green',
-        separator: ' → '
-      }));
-      grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%");
-      grunt.verbose.writeln(cmd);
-      _results.push(eval("" + cmd));
-    }
-    return _results;
+      cmd += ".write(\"" + file.dest + "\",function(e){if(e)throw new Error(e)})";
+      grunt.verbose.write("" + process.argv[0] + " -e '" + cmd + "'... ");
+      return grunt.util.spawn({
+        cmd: process.argv[0],
+        args: ['-e', cmd],
+        opts: {
+          stdio: 'inherit'
+        }
+      }, function(e) {
+        var from, to;
+        if (e) {
+          return done(false);
+        }
+        from = fs.statSync(file.src[0]).size;
+        to = fs.statSync(file.dest).size;
+        grunt.log.write(grunt.log.wordlist([(from / 1000).toFixed(2) + ' kB', (to / 1000).toFixed(2) + ' kB'], {
+          color: 'green',
+          separator: ' → '
+        }));
+        grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%");
+        return next(files.shift());
+      });
+    })(files.shift());
+    return null;
   });
+  return null;
 };
