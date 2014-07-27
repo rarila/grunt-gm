@@ -59,9 +59,12 @@ grunt.initConfig({
   }
 });
 ```
-Task will traverse the file list and execute `gm` tasks one by one, top down.
-
-Grunt with `--verbose` flag to print the corresponding commands:
+* Options precedence:
+  1. CLI, eg. `--skipExising`
+  * File, eg. `files:[{options:{skipExising:true}}]`
+  * Task, eg. `gm:{task1:{options:{skipExising:true}}`
+* Task will traverse the file list and execute `gm` tasks one by one, top down.
+* Grunt with `--verbose` flag to print the corresponding commands:
 `node -e 'require("gm")("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png"...`
 
 
