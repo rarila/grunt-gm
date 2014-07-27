@@ -1,4 +1,4 @@
-# grunt-gm v0.1.0
+# grunt-gm v0.1.1
 
 > Batch process your images with [gm][1].
 
@@ -22,9 +22,11 @@ grunt.loadNpmTasks('grunt-gm');
 ### Overview
 At the moment the task is pretty much just a simple `grunt` wrapper to [gm][1].
 
+Before start, please verify your [GraphicsMagick][2] or [ImageMagick][3] installation by running `convert -vsersion`.
+
 
 ### The Task
-See [basic usages][2].
+See [basic usages][4].
 ```javascript
 grunt.initConfig({
   gm: {
@@ -50,16 +52,19 @@ grunt.initConfig({
 Task will traverse the file list and execute `gm` tasks one by one, top down.
 
 Grunt with `--verbose` flag to print the corresponding commands:
-`gm("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png",console.log)`
+`node -e 'require("gm")("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png"...`
 
 
 
 ## Release History
 
+ * 2014-07-27   v0.1.1   Fix log dump and `mkdir -p dest` if not exists
  * 2014-07-27   v0.1.0   Initial release
 
 
 
 [1]: http://aheckmann.github.io/gm
-[2]: https://github.com/aheckmann/gm#basic-usage
+[2]: http://www.graphicsmagick.org
+[3]: http://www.imagemagick.org
+[4]: https://github.com/aheckmann/gm#basic-usage
 
