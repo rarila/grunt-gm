@@ -1,6 +1,8 @@
 module.exports = (grunt) ->
 
   fs = require 'fs'
+  mkdirp = require 'mkdirp'
+  path = require 'path'
 
   grunt.task.registerMultiTask 'gm', ->
     files = @files
@@ -8,6 +10,7 @@ module.exports = (grunt) ->
 
     (next = (file) ->
       return done true if not file
+      mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
       grunt.log.write "Processing #{file.src}... "
       cmd = 'require("gm")("' + file.src + '")'
       for name of file.tasks
@@ -16,6 +19,7 @@ module.exports = (grunt) ->
           else JSON.stringify arg
         cmd += ".#{name}(#{args})"
       cmd += ".write(\"#{file.dest}\",function(e){if(e)throw new Error(e)})"
+      grunt.verbose.write "#{process.argv[0]} -e '#{cmd}'... "
       grunt.util.spawn
           cmd: process.argv[0]
           args: ['-e', cmd]

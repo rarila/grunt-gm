@@ -1,14 +1,19 @@
 module.exports = function(grunt) {
-  var fs;
+  var fs, mkdirp, path;
   fs = require('fs');
+  mkdirp = require('mkdirp');
+  path = require('path');
   grunt.task.registerMultiTask('gm', function() {
     var done, files, next;
     files = this.files;
     done = this.async();
     (next = function(file) {
-      var args, cmd, name;
+      var args, cmd, dir, name;
       if (!file) {
         return done(true);
+      }
+      if (!grunt.file.exists((dir = path.dirname(file.dest)))) {
+        mkdirp(dir);
       }
       grunt.log.write("Processing " + file.src + "... ");
       cmd = 'require("gm")("' + file.src + '")';
@@ -23,6 +28,7 @@ module.exports = function(grunt) {
         cmd += "." + name + "(" + args + ")";
       }
       cmd += ".write(\"" + file.dest + "\",function(e){if(e)throw new Error(e)})";
+      grunt.verbose.write("" + process.argv[0] + " -e '" + cmd + "'... ");
       return grunt.util.spawn({
         cmd: process.argv[0],
         args: ['-e', cmd],
