@@ -11,12 +11,16 @@ module.exports = (grunt) ->
       test:
         options:
           skipExisting: false
+          stopOnError: false
         files: [
             cwd: 'test'
             dest: 'test/out'
             expand: true
             filter: 'isFile'
             src: ['**/*', '!**/out/*']
+            options:
+              skipExisting: true
+              stopOnError: true
             tasks:
               options: [{imageMagick:true}]
               noProfile: []
