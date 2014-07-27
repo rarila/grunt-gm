@@ -4,15 +4,21 @@ module.exports = function(grunt) {
   mkdirp = require('mkdirp');
   path = require('path');
   grunt.task.registerMultiTask('gm', function() {
-    var done, files, next, pos, total;
+    var done, files, next, opts, pos, skipExisting, total;
     done = this.async();
     files = this.files;
+    opts = this.data.options;
+    skipExisting = grunt.option('skipExisting') || opts.skipExisting;
     pos = 0;
     total = files.length;
     (next = function(file) {
-      var args, cmd, dir, name;
+      var args, cmd, dir, name, _ref;
+      pos++;
       if (!file) {
         return done(true);
+      }
+      if ((skipExisting || ((_ref = file.options) != null ? _ref.skipExisting : void 0)) && grunt.file.exists(file.dest) && fs.statSync(file.dest).size) {
+        return next(files.shift());
       }
       if (!grunt.file.exists((dir = path.dirname(file.dest)))) {
         mkdirp(dir);
@@ -48,7 +54,7 @@ module.exports = function(grunt) {
           color: 'green',
           separator: ' → '
         }));
-        grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%, " + (pos++) + "/" + total);
+        grunt.log.writeln(", " + ((((to - from) / from) * 100).toFixed(2)) + "%, " + pos + "/" + total);
         return next(files.shift());
       });
     })(files.shift());

@@ -9,6 +9,8 @@ module.exports = (grunt) ->
           'tasks/gm.js': 'src/gm.coffee'
     gm:
       test:
+        options:
+          skipExisting: false
         files: [
             cwd: 'test'
             dest: 'test/out'
