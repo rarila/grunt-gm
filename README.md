@@ -24,6 +24,10 @@ At the moment the task is pretty much just a simple `grunt` wrapper to [gm][1].
 
 Before start, please verify your [GraphicsMagick][2] or [ImageMagick][3] installation by running `convert -vsersion`.
 
+If the task ran into error `Fatal error: Maximum call stack size exceeded`, it's probably because the files array is too long. <br>To resolve this, try:
+* Run `grunt` with custom stack size `node --stack-size=9999 node_modules/grunt-cli/bin/grunt gm`
+* Check default by `node --v8-options | grep -B0 -A1 stack_size`
+
 
 ### The Task
 See [basic usages][4].
