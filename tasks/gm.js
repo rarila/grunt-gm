@@ -18,7 +18,7 @@ module.exports = function(grunt) {
     count = 0;
     total = files.length;
     (next = function(file) {
-      var args, dir, handle, name, _ref, _ref1, _ref2, _skipExisting, _stopOnError;
+      var args, dir, handle, i, name, task, _i, _len, _ref, _ref1, _ref2, _skipExisting, _stopOnError;
       if (!file) {
         if (skippedItems.length) {
           grunt.log.subhead("" + skippedItems.length + " items skipped:");
@@ -62,11 +62,17 @@ module.exports = function(grunt) {
       }
       handle = gm(file.src[0]);
       _ref2 = file.tasks;
-      for (name in _ref2) {
-        args = _ref2[name];
-        handle = handle[name].apply(handle, args);
+      for (i = _i = 0, _len = _ref2.length; _i < _len; i = ++_i) {
+        task = _ref2[i];
+        for (name in task) {
+          args = task[name];
+          handle = handle[name].apply(handle, args);
+        }
+        grunt.verbose.write("" + (JSON.stringify(handle.args())) + "... ");
+        if (i !== file.tasks.length) {
+          handle = gm(handle.stream(), file.src[0]);
+        }
       }
-      grunt.verbose.write("" + (JSON.stringify(handle.args())) + "... ");
       return handle.write(file.dest, function(e) {
         var from, to;
         if (e || !grunt.file.exists(file.dest)) {

@@ -60,9 +60,13 @@ module.exports = (grunt) ->
 
       # form inline cmd
       handle = gm file.src[0]
-      for name, args of file.tasks
-        handle = handle[name].apply handle, args
-      grunt.verbose.write "#{JSON.stringify handle.args()}... "
+      for task, i in file.tasks
+        for name, args of task
+          handle = handle[name].apply handle, args
+        grunt.verbose.write "#{JSON.stringify handle.args()}... "
+        if i isnt file.tasks.length
+          handle = gm handle.stream(), file.src[0]
+
       handle.write file.dest, (e) ->
         # gm err or file write err
         if e or not grunt.file.exists file.dest
