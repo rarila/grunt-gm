@@ -1,4 +1,4 @@
-# grunt-gm v0.2.1
+# grunt-gm v0.3.0
 
 > Batch process your images with [gm][1].
 
@@ -107,6 +107,7 @@ Original|After&nbsp;Task&nbsp;#1|After&nbsp;Task&nbsp;#2|After&nbsp;Task&nbsp;#3
 
 ## Release History
 
+ * 2014-07-30   v0.3.0   Support multiple gm tasks
  * 2014-07-29   v0.2.1   Reimplement the task
  * 2014-07-28   v0.2.0   Add options `skipExisting` and `stopOnError`
  * 2014-07-27   v0.1.2   Temp fix require
