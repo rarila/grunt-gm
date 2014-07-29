@@ -85,6 +85,12 @@ grunt.initConfig({
   }
 });
 ```
+
+Original|After Task #1|After Task #2|After Task #3
+:------:|:-----------:|:-----------:|:-----------:
+![gruntjs](/test/gruntjs.png?raw=true)|![gruntjs](/test/out/gruntjs-1.png?raw=true)|![gruntjs](/test/out/gruntjs-2.png?raw=true)|![gruntjs](/test/out/gruntjs-3.png?raw=true)
+![gruntjs](/test/nodejs.png?raw=true)|![nodejs](/test/out/nodejs-1.png?raw=true)|![nodejs](/test/out/nodejs-2.png?raw=true)|![nodejs](/test/out/nodejs-3.png?raw=true)
+
 * Options precedence:
   1. CLI, eg. `--skipExising`
   * File, eg. `files:[{options:{skipExising:true}}]`
