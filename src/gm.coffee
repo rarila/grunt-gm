@@ -1,6 +1,7 @@
 module.exports = (grunt) ->
 
   fs = require 'fs'
+  gm = require 'gm'
   mkdirp = require 'mkdirp'
   path = require 'path'
 
@@ -58,40 +59,29 @@ module.exports = (grunt) ->
       mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
 
       # form inline cmd
-      # TODO how to require properly with -e
-      cmd = "require(\"#{__dirname}/../node_modules/gm\")(\"#{file.src}\")"
-      for name of file.tasks
-        args = file.tasks[name].map (arg) ->
-          if typeof arg isnt 'object' then arg
-          else JSON.stringify arg
-        cmd += ".#{name}(#{args})"
-      cmd += ".write(\"#{file.dest}\",function(e){if(e)throw new Error(e)})"
-      grunt.verbose.write "#{process.argv[0]} -e '#{cmd}'... "
-
-      # run
-      grunt.util.spawn
-          cmd: process.argv[0]
-          args: ['-e', cmd]
-          opts: stdio: 'inherit'
-        , (e) ->
-          # gm err or file write err
-          if e or not grunt.file.exists file.dest
-            grunt.log.error "Not written: #{file.dest}, #{count}/#{total}"
-            errorItems.push file.dest
-            return done false if _stopOnError
-          else
-            from = fs.statSync(file.src[0]).size
-            to = fs.statSync(file.dest).size
-            grunt.log.write grunt.log.wordlist [
-              (from / 1000).toFixed(2) + ' kB'
-              (to / 1000).toFixed(2) + ' kB'
-            ], color: 'green', separator: ' → '
-            grunt.log.writeln ", \
-              #{(((to - from) / from) * 100).toFixed 2}%, \
-              #{count}/#{total}"
-          # next
-          next files.shift()
-
+      handle = gm file.src[0]
+      for name, args of file.tasks
+        handle = handle[name].apply handle, args
+      grunt.verbose.write "#{JSON.stringify handle.args()}... "
+      handle.write file.dest, (e) ->
+        # gm err or file write err
+        if e or not grunt.file.exists file.dest
+          grunt.log.error "Not written: #{file.dest}, #{count}/#{total}"
+          grunt.log.writeln arguments[2]
+          errorItems.push file.dest
+          return done false if _stopOnError
+        else
+          from = fs.statSync(file.src[0]).size
+          to = fs.statSync(file.dest).size
+          grunt.log.write grunt.log.wordlist [
+            (from / 1000).toFixed(2) + ' kB'
+            (to / 1000).toFixed(2) + ' kB'
+          ], color: 'green', separator: ' → '
+          grunt.log.writeln ", \
+            #{(((to - from) / from) * 100).toFixed 2}%, \
+            #{count}/#{total}"
+        # next
+        next files.shift()
     ) files.shift()
 
     null
