@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
-  var fs, mkdirp, path;
+  var fs, gm, mkdirp, path;
   fs = require('fs');
+  gm = require('gm');
   mkdirp = require('mkdirp');
   path = require('path');
   grunt.task.registerMultiTask('gm', function() {
@@ -17,7 +18,7 @@ module.exports = function(grunt) {
     count = 0;
     total = files.length;
     (next = function(file) {
-      var args, cmd, dir, name, _ref, _ref1, _skipExisting, _stopOnError;
+      var args, dir, handle, name, _ref, _ref1, _ref2, _skipExisting, _stopOnError;
       if (!file) {
         if (skippedItems.length) {
           grunt.log.subhead("" + skippedItems.length + " items skipped:");
@@ -59,29 +60,18 @@ module.exports = function(grunt) {
       if (!grunt.file.exists((dir = path.dirname(file.dest)))) {
         mkdirp(dir);
       }
-      cmd = "require(\"" + __dirname + "/../node_modules/gm\")(\"" + file.src + "\")";
-      for (name in file.tasks) {
-        args = file.tasks[name].map(function(arg) {
-          if (typeof arg !== 'object') {
-            return arg;
-          } else {
-            return JSON.stringify(arg);
-          }
-        });
-        cmd += "." + name + "(" + args + ")";
+      handle = gm(file.src[0]);
+      _ref2 = file.tasks;
+      for (name in _ref2) {
+        args = _ref2[name];
+        handle = handle[name].apply(handle, args);
       }
-      cmd += ".write(\"" + file.dest + "\",function(e){if(e)throw new Error(e)})";
-      grunt.verbose.write("" + process.argv[0] + " -e '" + cmd + "'... ");
-      return grunt.util.spawn({
-        cmd: process.argv[0],
-        args: ['-e', cmd],
-        opts: {
-          stdio: 'inherit'
-        }
-      }, function(e) {
+      grunt.verbose.write("" + (JSON.stringify(handle.args())) + "... ");
+      return handle.write(file.dest, function(e) {
         var from, to;
         if (e || !grunt.file.exists(file.dest)) {
           grunt.log.error("Not written: " + file.dest + ", " + count + "/" + total);
+          grunt.log.writeln(arguments[2]);
           errorItems.push(file.dest);
           if (_stopOnError) {
             return done(false);

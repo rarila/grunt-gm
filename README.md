@@ -1,4 +1,4 @@
-# grunt-gm v0.2.0
+# grunt-gm v0.2.1
 
 > Batch process your images with [gm][1].
 
@@ -28,6 +28,14 @@ If the task ran into error `Fatal error: Maximum call stack size exceeded`, it's
 * Run `grunt` with custom stack size `node --stack-size=9999 node_modules/grunt-cli/bin/grunt gm`
 * Check default by `node --v8-options | grep -B0 -A1 stack_size`
 
+If your are on OSX, and the task ended with:
+```bash
+dyld: Library not loaded: /usr/local/lib/libfreetype.6.dylib
+  Referenced from: /usr/local/bin/gm
+  Reason: image not found
+```
+try `brew unlink freetype && brew link freetype`
+
 
 ### The Task
 See [basic usages][4].
@@ -53,9 +61,11 @@ grunt.initConfig({
             stopOnError: true
           }
           tasks: {
-            options: [{imageMagick: true}],
-            noProfile: [],
-            resize: [200]
+            options: [{imageMagick:true}],
+            // Resize and watermark with [gm](http://www.graphicsmagick.org/composite.html)
+            resize: [300],
+            command: ['composite'],
+            in: ['test/sample.png']
           }
         }
       ]
@@ -73,12 +83,13 @@ grunt.initConfig({
 
 
 ## TODO
- 1. How to require properly? `cmd = "require(\"#{__dirname}/../node_modules/gm\")(\"#{file.src}\")"`
+ 1. ~~How to require properly? `cmd = "require(\"#{__dirname}/../node_modules/gm\")(\"#{file.src}\")"`~~ Fixed `v0.2.1`
 
 
 
 ## Release History
 
+ * 2014-07-29   v0.2.1   Reimplement the task
  * 2014-07-28   v0.2.0   Add options `skipExisting` and `stopOnError`
  * 2014-07-27   v0.1.2   Temp fix require
  * 2014-07-27   v0.1.1   Fix log dump and `mkdir -p dest` if not exists
