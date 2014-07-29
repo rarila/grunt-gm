@@ -17,14 +17,15 @@ module.exports = (grunt) ->
             dest: 'test/out'
             expand: true
             filter: 'isFile'
-            src: ['**/*', '!**/out/*']
+            src: ['**/*', '!**/out/*', '!sample.png']
             options:
               skipExisting: true
               stopOnError: true
             tasks:
               options: [{imageMagick:true}]
-              noProfile: []
-              resize: [200]
+              resize: [300]
+              command: ['composite']
+              in: ['test/sample.png']
         ]
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'

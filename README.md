@@ -61,9 +61,11 @@ grunt.initConfig({
             stopOnError: true
           }
           tasks: {
-            options: [{imageMagick: true}],
-            noProfile: [],
-            resize: [200]
+            options: [{imageMagick:true}],
+            // Resize and watermark with [gm](http://www.graphicsmagick.org/composite.html)
+            resize: [300],
+            command: ['composite'],
+            in: ['test/sample.png']
           }
         }
       ]
