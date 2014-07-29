@@ -60,13 +60,25 @@ grunt.initConfig({
             skipExisting: true,
             stopOnError: true
           }
-          tasks: {
-            options: [{imageMagick:true}],
-            // Resize and watermark with [gm](http://www.graphicsmagick.org/composite.html)
-            resize: [300],
-            command: ['composite'],
-            in: ['test/sample.png']
-          }
+          // image is passed as stream beteen tasks
+          tasks: [
+            {
+              // resize and watermark
+              options: [{imageMagick: true}],
+              resize: [200],
+              command: ['composite'],
+              in: ['test/sample.png']
+            }, {
+              // extent and center the image with padding arund it
+              gravity: ['Center'],
+              extent: [400, 360]
+            }, {
+              // frame it
+              options: [{imageMagick: true}],
+              command: ['composite'],
+              in: ['test/film.png']
+            }
+          ]
         }
       ]
     }

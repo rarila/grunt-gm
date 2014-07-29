@@ -30,6 +30,7 @@ module.exports = (grunt) ->
                 gravity: ['Center']
                 extent: [400, 360]
               ,
+                options: [{imageMagick:true}]
                 command: ['composite']
                 in: ['test/film.png']
             ]
