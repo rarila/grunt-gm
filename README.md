@@ -1,4 +1,4 @@
-# grunt-gm v0.2.1
+# grunt-gm v0.3.0
 
 > Batch process your images with [gm][1].
 
@@ -60,19 +60,37 @@ grunt.initConfig({
             skipExisting: true,
             stopOnError: true
           }
-          tasks: {
-            options: [{imageMagick:true}],
-            // Resize and watermark with [gm](http://www.graphicsmagick.org/composite.html)
-            resize: [300],
-            command: ['composite'],
-            in: ['test/sample.png']
-          }
+          // image is passed as stream beteen tasks
+          tasks: [
+            {
+              // resize and watermark
+              options: [{imageMagick: true}],
+              resize: [200],
+              command: ['composite'],
+              in: ['test/sample.png']
+            }, {
+              // extent and center the image with padding arund it
+              gravity: ['Center'],
+              extent: [400, 360]
+            }, {
+              // frame it
+              options: [{imageMagick: true}],
+              command: ['composite'],
+              in: ['test/film.png']
+            }
+          ]
         }
       ]
     }
   }
 });
 ```
+
+Original|After&nbsp;Task&nbsp;#1|After&nbsp;Task&nbsp;#2|After&nbsp;Task&nbsp;#3
+:------:|:---------------------:|:---------------------:|:---------------------:
+![gruntjs](/test/gruntjs.png?raw=true)|![gruntjs](/test/out/gruntjs-1.png?raw=true)|![gruntjs](/test/out/gruntjs-2.png?raw=true)|![gruntjs](/test/out/gruntjs-3.png?raw=true)
+![gruntjs](/test/nodejs.png?raw=true)|![nodejs](/test/out/nodejs-1.png?raw=true)|![nodejs](/test/out/nodejs-2.png?raw=true)|![nodejs](/test/out/nodejs-3.png?raw=true)
+
 * Options precedence:
   1. CLI, eg. `--skipExising`
   * File, eg. `files:[{options:{skipExising:true}}]`
@@ -89,6 +107,7 @@ grunt.initConfig({
 
 ## Release History
 
+ * 2014-07-30   v0.3.0   Support multiple gm tasks
  * 2014-07-29   v0.2.1   Reimplement the task
  * 2014-07-28   v0.2.0   Add options `skipExisting` and `stopOnError`
  * 2014-07-27   v0.1.2   Temp fix require
