@@ -68,11 +68,11 @@ module.exports = (grunt) ->
             # let gm setup task
             handle = handle[name].apply handle, _args
 
-          # setup gm io
-          handle = gm handle.stream(), file.src[0] if i isnt file.tasks.length
-
           # dump gm
           grunt.verbose.write "#{JSON.stringify handle.args()}..."
+
+          # setup gm io
+          handle = gm handle.stream(), file.src[0] if i isnt file.tasks.length
 
         # run task, and write dest, asynchronously
         handle.write file.dest, (e) ->
