@@ -1,5 +1,6 @@
 module.exports = (grunt) ->
 
+  extend = require 'extend'
   fs = require 'fs'
   gm = require 'gm'
   mkdirp = require 'mkdirp'
@@ -46,7 +47,7 @@ module.exports = (grunt) ->
       if SKIP_EXISTING isnt undefined then _skipExisting = SKIP_EXISTING
       if STOP_ON_ERROR isnt undefined then _stopOnError = STOP_ON_ERROR
 
-      grunt.log.write "Processing #{file.src}... "
+      grunt.log.write "Processing #{file.src}..."
 
       # skip if set
       if _skipExisting and
@@ -58,15 +59,28 @@ module.exports = (grunt) ->
       # create dest
       mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
 
-      # form inline cmd
+      # create gm with src
       handle = gm file.src[0]
+
+      # loop tasks
       for task, i in file.tasks
+
+        # inject task
         for name, args of task
-          handle = handle[name].apply handle, args
-        grunt.verbose.write "#{JSON.stringify handle.args()}... "
+          # execute task's arg with file if it's a function
+          _args = []
+          for arg in args
+            if typeof arg is 'function'
+              _args.push arg extend true, {}, {options:opts}, file
+            else _args.push arg
+          handle = handle[name].apply handle, _args
+
+        # run task
+        grunt.verbose.write "#{JSON.stringify handle.args()}..."
         if i isnt file.tasks.length
           handle = gm handle.stream(), file.src[0]
 
+      # write dest
       handle.write file.dest, (e) ->
         # gm err or file write err
         if e or not grunt.file.exists file.dest
@@ -81,11 +95,11 @@ module.exports = (grunt) ->
             (from / 1000).toFixed(2) + ' kB'
             (to / 1000).toFixed(2) + ' kB'
           ], color: 'green', separator: ' → '
-          grunt.log.writeln ", \
-            #{(((to - from) / from) * 100).toFixed 2}%, \
-            #{count}/#{total}"
+          grunt.log.writeln ", #{(((to - from) / from) * 100).toFixed 2}%, #{count}/#{total}"
+
         # next
         next files.shift()
+
     ) files.shift()
 
     null
