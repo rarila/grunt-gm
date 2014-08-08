@@ -1,12 +1,6 @@
 module.exports = (grunt) ->
 
   grunt.initConfig
-    coffee:
-      compile:
-        options:
-          bare: true
-        files:
-          'tasks/gm.js': 'src/gm.coffee'
     gm:
       test:
         options:
