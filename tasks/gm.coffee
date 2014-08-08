@@ -8,8 +8,8 @@ module.exports = (grunt) ->
 
   grunt.task.registerMultiTask 'gm', ->
 
+    # refs
     done = @async()
-    files = @files
     opts = @data.options
     skippedItems = []
     errorItems = []
@@ -22,21 +22,11 @@ module.exports = (grunt) ->
 
     # for log
     count = 0
-    total = files.length
+    total = @files.length
 
-    (next = (file) ->
+    (next = (file, files) ->
 
-      # done
-      if not file
-        if skippedItems.length
-          grunt.log.subhead "#{skippedItems.length} items skipped:"
-          grunt.log.writeln grunt.log.wordlist skippedItems,
-            color: 'cyan', separator: '\n'
-        if errorItems.length
-          grunt.log.subhead "#{errorItems.length} items with error:"
-          grunt.log.writeln grunt.log.wordlist errorItems,
-            color: 'red', separator: '\n'
-        return done true
+      grunt.log.write "Processing #{file.src}..."
 
       # refs
       count++
@@ -47,60 +37,79 @@ module.exports = (grunt) ->
       if SKIP_EXISTING isnt undefined then _skipExisting = SKIP_EXISTING
       if STOP_ON_ERROR isnt undefined then _stopOnError = STOP_ON_ERROR
 
-      grunt.log.write "Processing #{file.src}..."
-
       # skip if set
       if _skipExisting and
       grunt.file.exists(file.dest) and fs.statSync(file.dest).size
         grunt.log.writeln "skipped, #{count}/#{total}"
         skippedItems.push file.dest
-        return next files.shift()
 
-      # create dest
-      mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
+      # else, do it
+      else
 
-      # create gm with src
-      handle = gm file.src[0]
+        # create dest
+        mkdirp dir if not grunt.file.exists (dir = path.dirname file.dest)
 
-      # loop tasks
-      for task, i in file.tasks
+        # create gm with src
+        handle = gm file.src[0]
 
-        # inject task
-        for name, args of task
-          # execute task's arg with file if it's a function
-          _args = []
-          for arg in args
-            if typeof arg is 'function'
-              _args.push arg extend true, {}, {options:opts}, file
-            else _args.push arg
-          handle = handle[name].apply handle, _args
+        # loop tasks
+        for task, i in file.tasks
 
-        # run task
-        grunt.verbose.write "#{JSON.stringify handle.args()}..."
-        if i isnt file.tasks.length
-          handle = gm handle.stream(), file.src[0]
+          # inject task
+          for name, args of task
 
-      # write dest
-      handle.write file.dest, (e) ->
-        # gm err or file write err
-        if e or not grunt.file.exists file.dest
-          grunt.log.error "Not written: #{file.dest}, #{count}/#{total}"
-          grunt.log.writeln arguments[2]
-          errorItems.push file.dest
-          return done false if _stopOnError
-        else
-          from = fs.statSync(file.src[0]).size
-          to = fs.statSync(file.dest).size
-          grunt.log.write grunt.log.wordlist [
-            (from / 1000).toFixed(2) + ' kB'
-            (to / 1000).toFixed(2) + ' kB'
-          ], color: 'green', separator: ' → '
-          grunt.log.writeln ", #{(((to - from) / from) * 100).toFixed 2}%, #{count}/#{total}"
+            # execute task's arg with file if it's a function
+            _args = []
+            for arg in args
+              if typeof arg is 'function'
+                _args.push arg extend true, {}, {options:opts}, file
+              else _args.push arg
 
-        # next
-        next files.shift()
+            # let gm setup task
+            handle = handle[name].apply handle, _args
 
-    ) files.shift()
+          # setup gm io
+          handle = gm handle.stream(), file.src[0] if i isnt file.tasks.length
+
+          # dump gm
+          grunt.verbose.write "#{JSON.stringify handle.args()}..."
+
+        # run task, and write dest, asynchronously
+        handle.write file.dest, (e) ->
+
+          # gm err or file write err
+          if e or not grunt.file.exists file.dest
+            grunt.log.error "Not written: #{file.dest}, #{count}/#{total}"
+            grunt.log.writeln arguments[2]
+            errorItems.push file.dest
+            return done false if _stopOnError
+
+          # dump result
+          else
+            from = fs.statSync(file.src[0]).size
+            to = fs.statSync(file.dest).size
+            grunt.log.write grunt.log.wordlist [
+              (from / 1000).toFixed(2) + ' kB'
+              (to / 1000).toFixed(2) + ' kB'
+            ], color: 'green', separator: ' → '
+            grunt.log.writeln ", #{(((to - from) / from) * 100).toFixed 2}%, #{count}/#{total}"
+
+          # finish and dump summary
+          if not files.length
+            if skippedItems.length
+              grunt.log.subhead "#{skippedItems.length} items skipped:"
+              grunt.log.writeln grunt.log.wordlist skippedItems,
+                color: 'cyan', separator: '\n'
+            if errorItems.length
+              grunt.log.subhead "#{errorItems.length} items with error:"
+              grunt.log.writeln grunt.log.wordlist errorItems,
+                color: 'red', separator: '\n'
+            return done true
+
+          # else continue
+          else next files.shift(), files
+
+    ) @files.shift(), @files
 
     null
 
