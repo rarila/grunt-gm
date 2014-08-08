@@ -47,7 +47,12 @@ grunt.initConfig({
         // default: false, check if dest file exists and size > 0
         skipExisting: false,
         // default: false
-        stopOnError: false
+        stopOnError: false,
+        // task options will also be passed to arg callback
+        yourcustomopt: {
+          'test/gruntjs.png': '"JavaScript Task Runner"',
+          'test/nodejs.png': '"JavaScript Runtime"'
+        }
       },
       files: [
         {
@@ -55,7 +60,7 @@ grunt.initConfig({
           dest: 'test/out',
           expand: true,
           filter: 'isFile',
-          src: ['**/*', '!**/out/*'],
+          src: ['**/*', '!**/out/*', '!{film,sample}.png'],
           options: {
             skipExisting: true,
             stopOnError: true
@@ -64,7 +69,6 @@ grunt.initConfig({
           tasks: [
             {
               // resize and watermark
-              options: [{imageMagick: true}],
               resize: [200],
               command: ['composite'],
               in: ['test/sample.png']
@@ -74,9 +78,18 @@ grunt.initConfig({
               extent: [400, 360]
             }, {
               // frame it
-              options: [{imageMagick: true}],
               command: ['composite'],
               in: ['test/film.png']
+            }, {
+              // watermark text
+              gravity: ['North'],
+              font: ['arial', 30],
+              draw: [
+                'skewX', -13,
+                // function in arg list will be called with current file object
+                'fill', '#999', 'text', 2, 67, function (f) {return f.options.yourcustomopt[f.src[0]]},
+                'fill', '#000', 'text', 0, 65, function (f) {return f.options.yourcustomopt[f.src[0]]}
+              ]
             }
           ]
         }
@@ -86,18 +99,17 @@ grunt.initConfig({
 });
 ```
 
-Original|After&nbsp;Task&nbsp;#1|After&nbsp;Task&nbsp;#2|After&nbsp;Task&nbsp;#3
-:------:|:---------------------:|:---------------------:|:---------------------:
-![gruntjs](/test/gruntjs.png?raw=true)|![gruntjs](/test/out/gruntjs-1.png?raw=true)|![gruntjs](/test/out/gruntjs-2.png?raw=true)|![gruntjs](/test/out/gruntjs-3.png?raw=true)
-![gruntjs](/test/nodejs.png?raw=true)|![nodejs](/test/out/nodejs-1.png?raw=true)|![nodejs](/test/out/nodejs-2.png?raw=true)|![nodejs](/test/out/nodejs-3.png?raw=true)
+Original|After&nbsp;Task&nbsp;#1|After&nbsp;Task&nbsp;#2|After&nbsp;Task&nbsp;#3|After&nbsp;Task&nbsp;#4
+:------:|:---------------------:|:---------------------:|:---------------------:|:---------------------:
+![gruntjs](/test/gruntjs.png?raw=true)|![gruntjs](/test/out/gruntjs-1.png?raw=true)|![gruntjs](/test/out/gruntjs-2.png?raw=true)|![gruntjs](/test/out/gruntjs-3.png?raw=true)|![gruntjs](/test/out/gruntjs-4.png?raw=true)
+![gruntjs](/test/nodejs.png?raw=true)|![nodejs](/test/out/nodejs-1.png?raw=true)|![nodejs](/test/out/nodejs-2.png?raw=true)|![nodejs](/test/out/nodejs-3.png?raw=true)|![nodejs](/test/out/nodejs-4.png?raw=true)
 
 * Options precedence:
   1. CLI, eg. `--skipExising`
   * File, eg. `files:[{options:{skipExising:true}}]`
   * Task, eg. `gm:{task1:{options:{skipExising:true}}`
-* Task will traverse the file list and execute `gm` tasks one by one, top down.
-* Grunt with `--verbose` flag to print the corresponding commands:
-`node -e 'require("gm")("test/gruntjs.png").options({"imageMagick":true}).noProfile().resize(200).write("test/out/gruntjs.png"...`
+* Task will traverse the file list and execute `gm` tasks one by one, top down
+* Grunt with `--verbose` flag to print out corresponding `gm` argument list
 
 
 ## TODO
