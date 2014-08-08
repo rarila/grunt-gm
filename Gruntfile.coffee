@@ -1,17 +1,14 @@
 module.exports = (grunt) ->
 
   grunt.initConfig
-    coffee:
-      compile:
-        options:
-          bare: true
-        files:
-          'tasks/gm.js': 'src/gm.coffee'
     gm:
       test:
         options:
           skipExisting: false
           stopOnError: false
+          yourcustomopt:
+            'test/gruntjs.png': '"JavaScript Task Runner"'
+            'test/nodejs.png': '"JavaScript Runtime"'
         files: [
             cwd: 'test'
             dest: 'test/out'
@@ -22,7 +19,6 @@ module.exports = (grunt) ->
               skipExisting: false
               stopOnError: true
             tasks: [
-                options: [{imageMagick:true}]
                 resize: [200]
                 command: ['composite']
                 in: ['test/sample.png']
@@ -30,9 +26,16 @@ module.exports = (grunt) ->
                 gravity: ['Center']
                 extent: [400, 360]
               ,
-                options: [{imageMagick:true}]
                 command: ['composite']
                 in: ['test/film.png']
+              ,
+                gravity: ['North']
+                font: ['arial', 30]
+                draw: [
+                  'skewX', -13
+                  'fill', '#999', 'text', 2, 67, (f) -> f.options.yourcustomopt[f.src[0]]
+                  'fill', '#000', 'text', 0, 65, (f) -> f.options.yourcustomopt[f.src[0]]
+                ]
             ]
         ]
 
