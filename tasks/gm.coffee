@@ -26,6 +26,18 @@ module.exports = (grunt) ->
 
     (next = (file, files) ->
 
+      # stop the loop and dump summary
+      if not file
+        if skippedItems.length
+          grunt.log.subhead "#{skippedItems.length} items skipped:"
+          grunt.log.writeln grunt.log.wordlist skippedItems,
+            color: 'cyan', separator: '\n'
+        if errorItems.length
+          grunt.log.subhead "#{errorItems.length} items with error:"
+          grunt.log.writeln grunt.log.wordlist errorItems,
+            color: 'red', separator: '\n'
+        return done true
+
       grunt.log.write "Processing #{file.src}..."
 
       # refs
@@ -37,13 +49,14 @@ module.exports = (grunt) ->
       if SKIP_EXISTING isnt undefined then _skipExisting = SKIP_EXISTING
       if STOP_ON_ERROR isnt undefined then _stopOnError = STOP_ON_ERROR
 
-      # skip if set
+      # skip and continue
       if _skipExisting and
       grunt.file.exists(file.dest) and fs.statSync(file.dest).size
         grunt.log.writeln "skipped, #{count}/#{total}"
         skippedItems.push file.dest
+        next files.shift(), files
 
-      # else, do it
+      # process then continue
       else
 
         # create dest
@@ -94,20 +107,9 @@ module.exports = (grunt) ->
             ], color: 'green', separator: ' → '
             grunt.log.writeln ", #{(((to - from) / from) * 100).toFixed 2}%, #{count}/#{total}"
 
-          # finish and dump summary
-          if not files.length
-            if skippedItems.length
-              grunt.log.subhead "#{skippedItems.length} items skipped:"
-              grunt.log.writeln grunt.log.wordlist skippedItems,
-                color: 'cyan', separator: '\n'
-            if errorItems.length
-              grunt.log.subhead "#{errorItems.length} items with error:"
-              grunt.log.writeln grunt.log.wordlist errorItems,
-                color: 'red', separator: '\n'
-            return done true
+          # continue
+          next files.shift(), files
 
-          # else continue
-          else next files.shift(), files
 
     ) @files.shift(), @files
 
