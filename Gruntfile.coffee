@@ -1,6 +1,17 @@
 module.exports = (grunt) ->
 
   grunt.initConfig
+
+    coffee:
+      install:
+        options:
+          bare: true
+        expand: true
+        filter: 'isFile'
+        cwd: 'src'
+        src: ['**/*.coffee']
+        ext: '.js'
+
     gm:
       test:
         options:
