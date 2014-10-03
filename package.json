@@ -31,5 +31,8 @@
   },
   "devDependencies": {
     "grunt-contrib-coffee": "^0.10.1"
+  },
+  "scripts": {
+    "install": "grunt coffee"
   }
 }
