@@ -1,6 +1,6 @@
 {
   "name": "grunt-gm",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Batch process your images with gm.",
   "repository": {
     "type": "git",
