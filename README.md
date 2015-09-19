@@ -22,7 +22,7 @@ grunt.loadNpmTasks('grunt-gm');
 ### Overview
 At the moment the task is pretty much just a simple `grunt` wrapper to [gm][1].
 
-Before start, please verify your [GraphicsMagick][2] or [ImageMagick][3] installation by running `convert -vsersion`.
+Before start, please verify your [GraphicsMagick][2] or [ImageMagick][3] installation by running `convert -version`.
 
 If the task ran into error `Fatal error: Maximum call stack size exceeded`, it's probably because the files array is too long. <br>To resolve this, try:
 * Run `grunt` with custom stack size `node --stack-size=9999 node_modules/grunt-cli/bin/grunt gm`
@@ -65,7 +65,7 @@ grunt.initConfig({
             skipExisting: true,
             stopOnError: true
           }
-          // image is passed as stream beteen tasks
+          // image is passed as stream between tasks
           tasks: [
             {
               // resize and watermark
@@ -73,7 +73,7 @@ grunt.initConfig({
               command: ['composite'],
               in: ['test/sample.png']
             }, {
-              // extent and center the image with padding arund it
+              // extent and center the image with padding around it
               gravity: ['Center'],
               extent: [400, 360]
             }, {
